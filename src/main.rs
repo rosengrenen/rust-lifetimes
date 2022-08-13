@@ -2,6 +2,12 @@ pub struct Device<'a> {
     id: &'a u32,
 }
 
+impl<'a> Device<'a> {
+    pub fn new(id: &'a u32) -> Self {
+        Self { id }
+    }
+}
+
 pub struct Memory<'a> {
     device: &'a Device<'a>,
 }
@@ -37,12 +43,13 @@ impl<'a> Buffer<'a> {
         }
     }
 
-    pub fn from_data<T: Copy>(device: &'a Device, _data: &[T]) -> Self {
+    pub fn from_data<T: Copy>(device: &'a Device, data: &[T]) -> Self {
         let mut staging_buffer = Buffer::new(device);
 
         {
             let staging_buffer_memory = staging_buffer.memory_mut();
             staging_buffer_memory.map();
+            staging_buffer_memory.copy_from_host(data);
             staging_buffer_memory.unmap();
         }
 
@@ -70,5 +77,7 @@ impl<'a> Drop for Buffer<'a> {
 }
 
 fn main() {
-    println!("Hello, world!");
+    let id = 5;
+    let device = Device::new(&id);
+    let _buffer = Buffer::new(&device);
 }
