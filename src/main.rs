@@ -46,12 +46,15 @@ impl<'a> Buffer<'a> {
     pub fn from_data<T: Copy>(device: &'a Device, data: &[T]) -> Self {
         let mut staging_buffer = Buffer::new(device);
 
-        {
-            let staging_buffer_memory = staging_buffer.memory_mut();
-            staging_buffer_memory.map();
-            staging_buffer_memory.copy_from_host(data);
-            staging_buffer_memory.unmap();
-        }
+        // Works
+        staging_buffer.memory.map();
+        staging_buffer.memory.copy_from_host(data);
+        staging_buffer.memory.unmap();
+
+        // Does not work
+        // staging_buffer.memory_mut().map();
+        // staging_buffer.memory_mut().copy_from_host(data);
+        // staging_buffer.memory_mut().unmap();
 
         let buffer = Self::new(device);
         staging_buffer.copy_to_buffer(&buffer);
